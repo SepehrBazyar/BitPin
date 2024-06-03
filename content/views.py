@@ -2,11 +2,13 @@ from uuid import UUID
 
 from django.db.models import Avg, Count
 from rest_framework import generics, status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Post, Rating
+from .paginations import CustomPagination
 from .serializers import (
     PostSerializer,
     RatingSerializer,
@@ -15,6 +17,10 @@ from .serializers import (
 # Create your views here.
 class PostListView(generics.ListAPIView):
     serializer_class = PostSerializer
+    pagination_class = CustomPagination
+    permission_classes = (
+        IsAuthenticated,
+    )
 
     def get_queryset(self):
         return Post.objects.annotate(
@@ -23,17 +29,22 @@ class PostListView(generics.ListAPIView):
         )
 
     def list(self, request: Request, *args, **kwargs):
+        user = request.user
         queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        for post_data in serializer.data:
-            post_id = post_data['id']
-            user_rating = Rating.objects.filter(
-                post_id=post_id,
-                user=request.user,
-            ).first()
-            post_data['user_rating'] = user_rating.score if user_rating else None
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            paginated_response = self.get_paginated_response(serializer.data)
 
-        return Response(serializer.data)
+            for post_data in paginated_response.data['results']:
+                post_id = post_data['id']
+                user_rating = Rating.objects.filter(
+                    user=user,
+                    post_id=post_id,
+                ).first()
+                post_data['user_rating'] = user_rating.score if user_rating else None
+
+            return paginated_response
 
 
 class RatingCreateUpdateView(APIView):
