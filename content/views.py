@@ -5,10 +5,9 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from .models import Post, Rating
-from .paginations import CustomPagination
+from .pagination import CustomPagination
 from .serializers import (
     PostSerializer,
     RatingSerializer,
@@ -47,26 +46,26 @@ class PostListView(generics.ListAPIView):
             return paginated_response
 
 
-class RatingCreateUpdateView(APIView):
-    def post(self, request: Request, post_id: UUID):
+class RatingCreateUpdateView(generics.CreateAPIView):
+    serializer_class = RatingSerializer
+    permission_classes = (
+        IsAuthenticated,
+    )
+
+    def create(self, request: Request, post_id: UUID, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
         post = generics.get_object_or_404(Post, id=post_id)
-        score = request.data.get('score')
-
-        # if score is None or not (0 <= int(score) <= 5):
-        #     return Response(
-        #         {"error": "Invalid score"},
-        #         status=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        #     )
-
-        rating, _ = Rating.objects.update_or_create(
+        _, created = Rating.objects.update_or_create(
             post=post,
             user=request.user,
             defaults={
-                'score': score,
+                'score': serializer.validated_data["score"],
             },
         )
 
         return Response(
-            RatingSerializer(instance=rating).data,
+            {"message": created},
             status=status.HTTP_201_CREATED,
         )
