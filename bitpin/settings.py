@@ -119,6 +119,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
+LOCALE_PATHS = [
+    BASE_DIR / 'locale/',
+]
+
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
