@@ -39,10 +39,10 @@ jobs:
         poetry install
 
     - name: Linting
-      run: ruff check
+      run: poetry run ruff check
 
     - name: Code Formatting
-      run: ruff format --check
+      run: poetry run ruff format --check
 
     - name: Run Migrations
       run: poetry run python manage.py migrate
