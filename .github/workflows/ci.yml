@@ -28,7 +28,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set Up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
@@ -37,6 +37,11 @@ jobs:
       run: |
         pip install poetry
         poetry install
+
+    - name: Set Up Environment Variables
+      run: |
+        echo "DEBUG=True" >> .env
+        echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
 
     - name: Linting
       run: poetry run ruff check
