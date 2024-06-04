@@ -1,10 +1,11 @@
 from uuid import uuid4
 
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 from .managers import CustomManager
 from .utils import validate_score
+
 
 # Create your models here.
 class AbstractBaseModel(models.Model):
@@ -33,9 +34,7 @@ class TimeStampMixin(models.Model):
 
     class Meta:
         abstract = True
-        ordering = (
-            '-created_at',
-        )
+        ordering = ("-created_at",)
 
 
 class Post(BaseModel, TimeStampMixin):
@@ -50,7 +49,7 @@ class Rating(BaseModel):
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
-        related_name='ratings',
+        related_name="ratings",
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     score = models.IntegerField(
@@ -61,6 +60,4 @@ class Rating(BaseModel):
     )
 
     class Meta:
-        unique_together = (
-            ('post', 'user'),
-        )
+        unique_together = (("post", "user"),)

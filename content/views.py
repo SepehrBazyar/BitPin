@@ -11,23 +11,22 @@ from .models import Post, Rating
 from .pagination import CustomPagination
 from .serializers import (
     PostSerializer,
-    RatingSerializer,
     RatingResponseSerializer,
+    RatingSerializer,
 )
+
 
 # Create your views here.
 class PostListView(generics.ListAPIView):
     serializer_class = PostSerializer
     pagination_class = CustomPagination
-    permission_classes = (
-        IsAuthenticated,
-    )
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return Post.objects.annotate(
-            ratings_count=Count('ratings'),
-            average_rating=Avg('ratings__score')
-        ).order_by('-created_at')
+            ratings_count=Count("ratings"),
+            average_rating=Avg("ratings__score"),
+        ).order_by("-created_at")
 
     def list(self, request: Request, *args, **kwargs):
         user = request.user
@@ -37,22 +36,20 @@ class PostListView(generics.ListAPIView):
             serializer = self.get_serializer(page, many=True)
             paginated_response = self.get_paginated_response(serializer.data)
 
-            for post_data in paginated_response.data['results']:
-                post_id = post_data['id']
+            for post_data in paginated_response.data["results"]:
+                post_id = post_data["id"]
                 user_rating = Rating.objects.filter(
                     user=user,
                     post_id=post_id,
                 ).first()
-                post_data['user_rating'] = user_rating.score if user_rating else None
+                post_data["user_rating"] = user_rating.score if user_rating else None
 
             return paginated_response
 
 
 class RatingCreateUpdateView(generics.CreateAPIView):
     serializer_class = RatingSerializer
-    permission_classes = (
-        IsAuthenticated,
-    )
+    permission_classes = (IsAuthenticated,)
 
     @extend_schema(
         responses={
@@ -71,11 +68,11 @@ class RatingCreateUpdateView(generics.CreateAPIView):
             post=post,
             user=request.user,
             defaults={
-                'score': serializer.validated_data['score'],
+                "score": serializer.validated_data["score"],
             },
         )
 
         return Response(
-            {'is_created': is_created},
+            {"is_created": is_created},
             status=status.HTTP_201_CREATED,
         )

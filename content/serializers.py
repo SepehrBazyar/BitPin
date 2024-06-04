@@ -24,10 +24,10 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = (
-            'id',
-            'title',
-            'content',
-            'ratings_count',
-            'average_rating',
-            'user_rating',
+            "id",
+            "title",
+            "content",
+            "ratings_count",
+            "average_rating",
+            "user_rating",
         )
