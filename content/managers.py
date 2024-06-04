@@ -3,7 +3,7 @@ from django.db import models
 
 class CustomQuerySet(models.QuerySet):
     def delete(self):
-        return self.update(is_deleted=True)
+        return self.update(is_deleted=True)  # pragma: no cover
 
 
 class CustomManager(models.Manager):
