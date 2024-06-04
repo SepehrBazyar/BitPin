@@ -18,6 +18,8 @@ python-decouple = "^3.8"
 django-debug-toolbar = "^4.4.2"
 pre-commit = "^3.7.1"
 ruff = "^0.4.7"
+pytest = "^8.2.1"
+pytest-django = "^4.8.0"
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
