@@ -1,0 +1,6 @@
+[report]
+show_missing = True
+exclude_lines =
+    pragma: no cover
+    def __str__
+    if __name__ == .__main__.:

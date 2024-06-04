@@ -41,6 +41,8 @@ class Post(BaseModel, TimeStampMixin):
     title = models.CharField(max_length=255, unique=True)
     content = models.TextField()
 
+    ema_rating = models.FloatField(default=0.0)
+
     def __str__(self):
         return self.title
 
