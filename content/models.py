@@ -1,10 +1,10 @@
 from uuid import uuid4
 
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from .managers import CustomManager
-from .utils import validate_score
 
 
 # Create your models here.
@@ -55,7 +55,8 @@ class Rating(BaseModel):
     score = models.IntegerField(
         default=0,
         validators=[
-            validate_score,
+            MinValueValidator(0),
+            MaxValueValidator(5),
         ],
     )
 
