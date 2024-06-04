@@ -27,6 +27,7 @@ class PostSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "content",
+            "ema_rating",
             "ratings_count",
             "average_rating",
             "user_rating",
