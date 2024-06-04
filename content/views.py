@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from django.db.models import Avg, Count
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -11,6 +12,7 @@ from .pagination import CustomPagination
 from .serializers import (
     PostSerializer,
     RatingSerializer,
+    RatingResponseSerializer,
 )
 
 # Create your views here.
@@ -25,7 +27,7 @@ class PostListView(generics.ListAPIView):
         return Post.objects.annotate(
             ratings_count=Count('ratings'),
             average_rating=Avg('ratings__score')
-        )
+        ).order_by('-created_at')
 
     def list(self, request: Request, *args, **kwargs):
         user = request.user
@@ -52,20 +54,28 @@ class RatingCreateUpdateView(generics.CreateAPIView):
         IsAuthenticated,
     )
 
+    @extend_schema(
+        responses={
+            status.HTTP_201_CREATED: RatingResponseSerializer,
+        },
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
     def create(self, request: Request, post_id: UUID, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         post = generics.get_object_or_404(Post, id=post_id)
-        _, created = Rating.objects.update_or_create(
+        _, is_created = Rating.objects.update_or_create(
             post=post,
             user=request.user,
             defaults={
-                'score': serializer.validated_data["score"],
+                'score': serializer.validated_data['score'],
             },
         )
 
         return Response(
-            {"message": created},
+            {'is_created': is_created},
             status=status.HTTP_201_CREATED,
         )

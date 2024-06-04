@@ -27,7 +27,18 @@ class BaseModel(AbstractBaseModel):
         abstract = True
 
 
-class Post(BaseModel):
+class TimeStampMixin(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+        ordering = (
+            '-created_at',
+        )
+
+
+class Post(BaseModel, TimeStampMixin):
     title = models.CharField(max_length=255, unique=True)
     content = models.TextField()
 
@@ -50,6 +61,6 @@ class Rating(BaseModel):
     )
 
     class Meta:
-        unique_together = [
+        unique_together = (
             ('post', 'user'),
-        ]
+        )

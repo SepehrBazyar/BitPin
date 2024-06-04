@@ -1,10 +1,14 @@
 from rest_framework import serializers
 
-from .models import Post, Rating
+from .models import Post
 
 
 class RatingSerializer(serializers.Serializer):
     score = serializers.IntegerField(min_value=0, max_value=5)
+
+
+class RatingResponseSerializer(serializers.Serializer):
+    is_created = serializers.BooleanField()
 
 
 class PostSerializer(serializers.ModelSerializer):
