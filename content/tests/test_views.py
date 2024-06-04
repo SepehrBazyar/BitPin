@@ -7,7 +7,7 @@ from rest_framework.test import APIClient
 from ..models import Post, Rating
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def api_client():
     return APIClient()
 
